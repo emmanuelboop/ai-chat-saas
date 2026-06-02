@@ -4,7 +4,7 @@ A full-stack AI chat application built with React, TypeScript, Express, MongoDB 
 
 ## Live Demo
 
-https://YOUR-VERCEL-URL.vercel.app
+https://ai-chat-saas-one.vercel.app/
 
 ## Features
 
