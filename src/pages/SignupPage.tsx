@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
-
+import { API_URL } from "@/api/config"
 
 
 function SignupPage() {
@@ -22,7 +22,7 @@ function SignupPage() {
         console.log({ email, password, })
 
         const response = await fetch(
-            "http://localhost:5000/auth/signup",
+            `${API_URL}/auth/signup`,
             {
                 method: "POST",
                 headers: {

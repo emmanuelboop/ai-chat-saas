@@ -1,9 +1,9 @@
 import type { Message } from "@/types/message";
-
+import { API_URL } from "@/api/config";
 
 export async function sendChatMessage(messages: Message[]) {
     const response = await fetch(
-        "http://localhost:5000/chat",
+        `${API_URL}/chat`,
         {
             method: "POST",
             headers: {

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { API_URL } from "@/api/config"
 
 function LoginPage() {
     const [email, setEmail] = useState("")
@@ -13,7 +14,7 @@ function LoginPage() {
             return;
         }
         const response = await fetch(
-            "http://localhost:5000/auth/login",
+            `${API_URL}/auth/login`,
             {
                 method: "POST",
                 headers: {
