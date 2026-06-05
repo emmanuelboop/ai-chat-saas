@@ -8,15 +8,17 @@ https://ai-chat-saas-one.vercel.app/
 
 ## Features
 
-- User Signup
-- User Login
-- JWT Authentication
-- Multiple Conversations
-- Rename Conversations
-- Delete Conversations
-- OpenAI Integration
+- User authentication with JWT
+- Secure signup and login
+- OpenAI-powered chat assistant
+- Multiple conversations
+- Persistent chat history using MongoDB Atlas
+- Rename conversations
+- Delete conversations
+- Conversation titles generated from first message
 - Responsive UI
-- MongoDB Atlas Database
+- Railway backend deployment
+- Vercel frontend deployment
 
 ## Screenshots
 
@@ -76,6 +78,18 @@ OpenAI API
 ↑
 
 Express API
+
+## What I Learned
+
+This project helped me gain hands-on experience with:
+
+- Building full-stack React applications
+- JWT authentication
+- MongoDB data modeling
+- REST API design
+- OpenAI API integration
+- Frontend and backend deployment
+- Managing persistent chat history
 
 ## Local Setup
 
