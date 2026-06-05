@@ -21,12 +21,14 @@ app.get('/', (req, res) => {
     res.send('<h1>Backend is running!</h1>');
 });
 
-app.get('/conversations', async (req, res) => { 
-    try{
-        const conversations = await Conversation.find();
+app.get('/conversations', async (req, res) => {
+    try {
+        const conversations = await Conversation.find({
+            userId: req.query.userId
+        });
         res.json(conversations);
 
-    }catch(error){
+    } catch (error) {
         console.log('Error:', error);
         res.status(500).json({ error: error.message });
     }
@@ -80,6 +82,49 @@ app.post('/conversations', async (req, res) => {
     } catch (error) {
         console.error('Error saving conversation:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+app.patch('/conversations/:id', async (req, res) => {
+    try {
+        const conversation =
+            await Conversation.findByIdAndUpdate(
+                req.params.id,
+                {
+                    title: req.body.title,
+                },
+                {
+                    new: true,
+                }
+            );
+
+        res.json(conversation);
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            error: "Internal Server Error",
+        });
+    }
+});
+
+app.delete('/conversations/:id', async (req, res) => {
+    try {
+        await Conversation.findByIdAndDelete(
+            req.params.id
+        );
+
+        res.json({
+            message: "Conversation deleted"
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            error: "Internal Server Error"
+        });
     }
 });
 

@@ -15,6 +15,7 @@ async function signup(req, res) {
     console.log("User created: " + user);
     const token = jwt.sign(
         {
+            id: user._id,
             email,
         },
         "my-secret-key",
@@ -43,7 +44,9 @@ async function login(req, res) {
     }
     const token = jwt.sign(
         {
+            id: user._id,
             email,
+
         },
         "my-secret-key",
         {

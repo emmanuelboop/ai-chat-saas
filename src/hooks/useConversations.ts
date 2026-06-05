@@ -2,7 +2,9 @@ import { useState } from "react";
 import type { Conversation } from "@/types/conversation";
 import { useEffect } from "react";
 import type { Message } from "@/types/message";
+import { getConversations, createConversation, updateConversationTitle as updateConversationTitleAPI, deleteConversationAPI } from "@/api/conversations";
 
+/*
 function loadConversations() {
     const stored = localStorage.getItem("conversations");
     if (!stored) {
@@ -15,22 +17,14 @@ function loadConversations() {
         ]
     }
     return JSON.parse(stored);
-}
-
-function loadActiveConversationId(conversations: Conversation[]) {
-    return (
-        localStorage.getItem("activeConversationId") || conversations[0].id
-    )
-}
+}*/
 
 export function useConversations() {
     const [conversations, setConversations] =
-        useState<Conversation[]>(loadConversations);
+        useState<Conversation[]>([]);
 
     const [activeConversationId, setActiveConversationId] =
-        useState(() =>
-            loadActiveConversationId(conversations)
-        );
+        useState("");
 
     function updateConversationTitle(conversationId: string, title: string) {
         setConversations((prev) =>
@@ -54,34 +48,56 @@ export function useConversations() {
         )
     }
 
-    function createNewConversation() {
-        const newConversation = {
-            id: crypto.randomUUID(),
-            title: "New Chat",
-            messages: [],
-        }
+    async function createNewConversation() {
+        const newConversation =
+            await createConversation();
 
-        setConversations((prev) => [...prev, newConversation]);
-        setActiveConversationId(newConversation.id);
+        setConversations((prev) => [
+            ...prev,
+            newConversation,
+        ]);
+
+        setActiveConversationId(
+            newConversation.id
+        );
     }
 
-    function deleteConversation(conversationId: string) {
-        const updatedConversations = conversations.filter(
-            (conversation) => conversation.id !== conversationId
-        )
+    async function deleteConversation(
+        conversationId: string
+    ) {
+
+        await deleteConversationAPI(
+            conversationId
+        );
+
+        const updatedConversations =
+            conversations.filter(
+                (conversation) =>
+                    conversation.id !== conversationId
+            );
 
         if (updatedConversations.length === 0) {
-            return
+            return;
         }
 
         setConversations(updatedConversations);
-        if (activeConversationId === conversationId) {
-            setActiveConversationId(updatedConversations[0].id);
-        }
 
+        if (
+            activeConversationId === conversationId
+        ) {
+            setActiveConversationId(
+                updatedConversations[0].id
+            );
+        }
     }
 
-    function renameConversation(conversationId: string, title: string) {
+    async function renameConversation(conversationId: string, title: string) {
+
+        await updateConversationTitleAPI(
+            conversationId,
+            title
+        );
+
         setConversations((prev) =>
             prev.map((conversation) =>
                 conversation.id === conversationId
@@ -91,13 +107,31 @@ export function useConversations() {
         )
     }
 
-    useEffect(() => {
-        localStorage.setItem("conversations", JSON.stringify(conversations));
-    }, [conversations]);
 
     useEffect(() => {
         localStorage.setItem("activeConversationId", activeConversationId);
     }, [activeConversationId]);
+
+    useEffect(() => {
+        async function fetchConversations() {
+            const data = await getConversations();
+
+            setConversations(data);
+        }
+
+        fetchConversations();
+    }, []);
+
+    useEffect(() => {
+        if (
+            conversations.length > 0 &&
+            !activeConversationId
+        ) {
+            setActiveConversationId(
+                conversations[0].id
+            );
+        }
+    }, [conversations, activeConversationId]);
 
     return {
         conversations,

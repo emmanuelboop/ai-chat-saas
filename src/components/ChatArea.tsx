@@ -4,6 +4,7 @@ import ChatInput from "./ChatInput"
 import type { Message } from "@/types/message"
 import { sendChatMessage } from "@/api/chat"
 import type { Conversation } from "@/types/conversation"
+import { saveMessage, updateConversationTitle as updateConversationTitleAPI } from "@/api/conversations"
 
 type ChatAreaProps = {
     activeConversation?: Conversation
@@ -37,11 +38,24 @@ function ChatArea({ activeConversation, updateConversationMessages, updateConver
             role: "user" as const,
         };
 
+        await saveMessage(
+            activeConversation!.id,
+            "user",
+            input
+        );
+
         if (messages.length === 0) {
+            const title = input.slice(0, 30);
+
             updateConversationTitle(
                 activeConversation!.id,
-                input.slice(0,30),
-            )
+                title,
+            );
+
+            await updateConversationTitleAPI(
+                activeConversation!.id,
+                title
+            );
         }
 
         updateConversationMessages(
@@ -54,6 +68,11 @@ function ChatArea({ activeConversation, updateConversationMessages, updateConver
 
 
             const reply = await sendChatMessage([...messages, userMessage]);
+            await saveMessage(
+                activeConversation!.id,
+                "assistant",
+                reply
+            );
 
             updateConversationMessages(
                 activeConversation!.id,
@@ -76,8 +95,8 @@ function ChatArea({ activeConversation, updateConversationMessages, updateConver
                     userMessage,
                     {
                         role: "assistant",
-                content: "Sorry, something went wrong."
-            }]);
+                        content: "Sorry, something went wrong."
+                    }]);
 
         } finally {
             setIsLoading(false);
