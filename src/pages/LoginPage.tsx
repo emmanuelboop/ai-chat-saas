@@ -1,84 +1,99 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { API_URL } from "@/api/config"
 
 function LoginPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
-    
+
     async function handleLogin() {
         if (!email || !password) {
-            alert("Please fill in all fields");
-            return;
+            alert("Please fill in all fields")
+            return
         }
-        const response = await fetch(
-            `${API_URL}/auth/login`,
-            {
+
+        setIsLoading(true)
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json",},
-                body: JSON.stringify({
-                    email,
-                    password,
-                }), 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            })
+            const data = await response.json()
+            if (!response.ok) {
+                alert(data.message)
+                return
             }
-        )
-        const data = await response.json();
-        if (!response.ok) {
-            alert(data.message);
-            return;
+            localStorage.setItem("token", data.token)
+            navigate("/chat")
+        } finally {
+            setIsLoading(false)
         }
-        localStorage.setItem("token", data.token);
-        navigate("/chat");
-        console.log(data);
     }
 
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-
-            <div className="w-full max-w-md p-8 border border-gray-800 rounded-xl">
-
-                <h1 className="text-3xl font-bold mb-6">
-                    Login
-                </h1>
-
-                <div className="flex flex-col gap-4">
-
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) =>
-                            setEmail(e.target.value)
-                        }
-                        className="p-3 rounded bg-gray-900"
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
-                        }
-                        className="p-3 rounded bg-gray-900"
-                    />
-
-
-                    <Button
-                        onClick={handleLogin}>
-                        Login
-                    </Button>
-
-                </div>
-
+        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-indigo-950 text-foreground flex items-center justify-center p-4">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
             </div>
 
+            <div className="relative w-full max-w-md p-8 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl">
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-lg font-bold shadow-lg shadow-indigo-500/25">
+                        ✦
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
+                        <p className="text-sm text-muted-foreground">Sign in to NovaChat</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Email</label>
+                        <input
+                            type="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Password</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                            className="w-full p-3 rounded-xl bg-white/5 border border-white/10 outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                        />
+                    </div>
+
+                    <Button
+                        onClick={handleLogin}
+                        disabled={isLoading}
+                        className="w-full mt-2 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 border-0 shadow-md shadow-indigo-500/20"
+                    >
+                        {isLoading ? "Signing in..." : "Sign in"}
+                    </Button>
+
+                    <p className="text-center text-sm text-muted-foreground">
+                        Don&apos;t have an account?{" "}
+                        <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
+                            Create one
+                        </Link>
+                    </p>
+                </div>
+            </div>
         </div>
-    );
+    )
 }
 
-export default LoginPage;
+export default LoginPage
